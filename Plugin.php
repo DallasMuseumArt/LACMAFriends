@@ -1,5 +1,7 @@
 <?php namespace DMA\LACMA;
 
+use App;
+use Illuminate\Foundation\AliasLoader;
 use System\Classes\PluginBase;
 use Illuminate\Support\Facades\Event;
 use DMA\Friends\Models\Usermeta as Metadata;
@@ -45,6 +47,21 @@ class Plugin extends PluginBase
             $context->extendedUserFields($widget);
         }); 
 
+        // Register service providers
+        App::register('Maatwebsite\Excel\ExcelServiceProvider');
+
+        // Register aliases
+        $alias = AliasLoader::getInstance();
+        $alias->alias('Excel', 'Maatwebsite\Excel\Facades\Excel');
+    }
+
+
+    /**
+     * {@inheritDoc}
+     */
+    public function register()
+    {
+        $this->registerConsoleCommand('lacma.import-nextgen-users', 'DMA\LACMA\Commands\ImportNextGen');
     }
 
     /**
