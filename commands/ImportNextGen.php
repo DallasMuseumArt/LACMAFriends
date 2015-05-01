@@ -3,6 +3,7 @@ namespace DMA\LACMA\Commands;
 
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use October\Rain\Database\ModelException;
 use Illuminate\Console\Command;
 use RainLab\User\Models\User;
 use RainLab\User\Models\Country;
@@ -135,6 +136,11 @@ class ImportNextGen extends Command
             $user->email = $this->seedEmail($result);
         }
 
+        // Set current member
+        if (!empty($usermeta->current_member_number)) {
+            $usermeta->current_member = Usermeta::IS_MEMBER;
+        }
+
         $user->is_activated             = true;
         $user->password                 = $result->cnadrprf_zip;
         $user->password_confirmation    = $result->cnadrprf_zip;
@@ -143,7 +149,7 @@ class ImportNextGen extends Command
             $user->save();
             $user->metadata()->save($usermeta);
             $this->counter++;
-        } catch(\October\Rain\Database\ModelException $e) {
+        } catch(ModelException $e) {
             $this->error($user->email . ": " . $e->getMessage());
             $this->error++;
         }
