@@ -46,13 +46,6 @@ class Plugin extends PluginBase
         Event::listen('backend.form.extendFields', function($widget) use ($context){
             $context->extendedUserFields($widget);
         }); 
-
-        // Register service providers
-        App::register('Maatwebsite\Excel\ExcelServiceProvider');
-
-        // Register aliases
-        $alias = AliasLoader::getInstance();
-        $alias->alias('Excel', 'Maatwebsite\Excel\Facades\Excel');
     }
 
 
