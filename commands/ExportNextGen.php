@@ -47,7 +47,7 @@ class ExportNextGen extends Command
                 });
             });
 
-        })->store('csv', storage_path('app/media/NextGEN Exports'), true);
+        })->store('csv', storage_path('app/media/NextGENExports'), true);
 
         $library = MediaLibrary::instance();
         $library->resetCache();
@@ -60,9 +60,14 @@ class ExportNextGen extends Command
     {
         static $firstRun = true;
 
-        $data = array_merge((array)$user->metadata->attributes, (array)$user->attributes);
-        // Don't export the password
-        unset($data['password']);
+        $userAttr = (array)$user->attributes;
+        $usermetaAttr = (array)$user->metadata->attributes;
+
+        // Exclude certain fields
+        unset($userAttr['password']);
+        unset($userAttr['email']);
+
+        $data = array_merge($usermetaAttr, $userAttr);
 
         $keys = array_keys($data);
 
