@@ -30,6 +30,11 @@ class ImportNextGen extends Command
     protected $description = 'Syncronize nextgen data into October';
 
     /**
+     * @var string A temporary password for accounts with no zipcode
+     */
+    protected $tempPassword = 'lacma4ever';
+
+    /**
      * @var string A count of processed records
      */
     protected $counter = 0;
@@ -76,14 +81,6 @@ class ImportNextGen extends Command
      */
     protected function processResult($result) 
     {
-        // bypass accounts with no zip for now until we know how to handle passwords for them
-        if (empty($result->cnadrprf_zip)) {
-            $name = empty($result->cnadrprfph_1_01_phone_number) ? 
-                $result->cnbio_first_name . " " . $result->cnbio_last_name : $result->cnadrprfph_1_01_phone_number;
-            $this->error($name . ": No zip code");
-            $this->error++;
-            return;
-        }
 
         $userKeys = [
             'cnadrprf_addrline1'            => 'street_addr',
@@ -91,18 +88,20 @@ class ImportNextGen extends Command
             'cnadrprf_state'                => 'state',
             'cnadrprf_zip'                  => 'zip',
             'cnadrprf_contrylongdscription' => 'country',
-            'cnadrprfph_1_01_phone_number'  => 'email',
+            //'cnadrprfph_1_01_phone_number'  => 'email',
             'cnmem_1_01_date_joined'        => 'created_at',
         ];
 
         $metaKeys = [
-            'nexgenid'                  => 'current_member_number',
-            'cnbio_first_name'          => 'first_name',
-            'cnbio_middle_name'         => 'middle_name',
-            'cnbio_last_name'           => 'last_name',
-            'cnbio_birth_date'          => 'birth_date',
-            'cnmem_1_01_cur_expires_on' => 'expires_on',
-            'cnrelind_1_01_name'        => 'guardian_name',
+            'nexgenid'                      => 'current_member_number',
+            'cnbio_first_name'              => 'first_name',
+            'cnbio_middle_name'             => 'middle_name',
+            'cnbio_last_name'               => 'last_name',
+            'cnbio_birth_date'              => 'birth_date',
+            'cnmem_1_01_cur_expires_on'     => 'expires_on',
+            'cnrelind_1_01_name'            => 'guardian_name',
+            'cnbio_id'                      => 'razorsedge_id',
+            'cnadrprfph_1_01_phone_number'  => 'email',
         ];
 
         $user = new User;
@@ -131,19 +130,22 @@ class ImportNextGen extends Command
             $usermeta->{$key} = $result->{$oldKey};
         }
 
-        // Save additional user fields
-        if (!$user->email) {
-            $user->email = $this->seedEmail($result);
-        }
+        // // Save additional user fields
+        // if (!$user->email) {
+        //     $user->email = $this->seedEmail($result);
+        // }
+        $user->email = $this->seedEmail($result);
 
         // Set current member
         if (!empty($usermeta->current_member_number)) {
             $usermeta->current_member = Usermeta::IS_MEMBER;
         }
 
+        $password = (!empty($result->cnadrprf_zip)) ? $result->cnadrprf_zip : $this->tempPassword;
+
         $user->is_activated             = true;
-        $user->password                 = $result->cnadrprf_zip;
-        $user->password_confirmation    = $result->cnadrprf_zip;
+        $user->password                 = $password;
+        $user->password_confirmation    = $password;
 
         try {         
             $user->save();

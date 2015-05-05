@@ -17,6 +17,8 @@ class AddUserData extends Migration {
             $table->string('guardian_name')->nullable();
             $table->string('middle_name')->nullable();
             $table->timestamp('expires_on')->nullable();
+            $table->string('razorsedge_id');
+            $table->string('email')->nullable();
         });
     }   
 
@@ -33,6 +35,8 @@ class AddUserData extends Migration {
             $table->dropColumn('guardian_name');
             $table->dropColumn('middle_name');
             $table->dropColumn('expires_on');
+            $table->dropColumn('razorsedge_id');
+            $table->dropColumn('email');
         });
     }   
 

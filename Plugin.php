@@ -62,6 +62,7 @@ class Plugin extends PluginBase
     public function register()
     {
         $this->registerConsoleCommand('lacma.import-nextgen-users', 'DMA\LACMA\Commands\ImportNextGen');
+        $this->registerConsoleCommand('lacma.export-nextgen-users', 'DMA\LACMA\Commands\ExportNextGen');
     }
 
     /**
