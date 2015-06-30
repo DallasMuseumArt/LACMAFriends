@@ -143,7 +143,8 @@ class ImportNextGen extends Command
 
         $password = (!empty($result->cnadrprf_zip)) ? $result->cnadrprf_zip : $this->tempPassword;
 
-        $user->name                     = $usermeta->current_member_number;
+        $user->username                 = $usermeta->current_member_number;
+        $user->name                     = $usermeta->first_name . ' ' . $usermeta->last_name;
         $user->is_activated             = true;
         $user->password                 = $password;
         $user->password_confirmation    = $password;
