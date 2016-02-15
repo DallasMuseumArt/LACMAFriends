@@ -141,7 +141,14 @@ class ImportNextGen extends Command
             $usermeta->current_member = Usermeta::IS_MEMBER;
         }
 
-        $password = (!empty($result->cnadrprf_zip)) ? $result->cnadrprf_zip : $this->tempPassword;
+        //Use tempPassword if no last name or if length is too short.
+        if (!empty($result->cnbio_last_name) && strlen($result->cnbio_last_name) > 4) {
+            $password = $result->cnbio_last_name;
+        }else{
+            $password = $this->tempPassword;
+        }
+
+        //$password = (!empty($result->cnbio_last_name))? $result->cnbio_last_name : $this->tempPassword;
 
         $user->username                 = $usermeta->current_member_number;
         $user->name                     = $usermeta->first_name . ' ' . $usermeta->last_name;

@@ -5,6 +5,7 @@ use Illuminate\Foundation\AliasLoader;
 use System\Classes\PluginBase;
 use Illuminate\Support\Facades\Event;
 use DMA\Friends\Models\Usermeta as Metadata;
+use DMA\LACMA\Classes\LacmaEventHandler;
 
 /**
  * LACMA Friends Plugin Information File
@@ -46,6 +47,9 @@ class Plugin extends PluginBase
         Event::listen('backend.form.extendFields', function($widget) use ($context){
             $context->extendedUserFields($widget);
         }); 
+
+        $subscriber = new LacmaEventHandler;
+        Event::subscribe($subscriber);
     }
 
 
@@ -85,6 +89,11 @@ class Plugin extends PluginBase
                 'label' => 'Expires On',
                 'tab'   => 'Metadata',
                 'span'  => 'left',
+            ],
+            'metadata[email]' => [
+                'label' => 'Email Address',
+                'tab'   => 'Metadata',
+                'span'  => 'right',
             ],
         ], 'primary');        
     }
